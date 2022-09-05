@@ -1,10 +1,14 @@
 import subprocess
 from time import sleep
 from datetime import date
+from datetime import datetime
 from datetime import timedelta
 
 SLEEP_TIME_IN_SECONDS = 1
 NEXT_X_MONTHS = 2*30
+DATE_FORMAT = "%Y-%m-%d"
+HOLIDAY_START_DATE = datetime.strptime("2022-11-17", DATE_FORMAT).date()
+HOLIDAT_END_DATE = datetime.strptime("2022-12-01", DATE_FORMAT).date()
 
 def get_char(process):
     character = process.stdout.read1()
@@ -21,12 +25,16 @@ def search_for_output(strings, process):
         buffer = buffer + get_char(process)
         
 while True:
-    today = date.today().strftime("%Y-%m-%d")
-    next2month = (date.today() + timedelta(NEXT_X_MONTHS)).strftime("%Y-%m-%d")
-    tomorrow = (date.today() + timedelta(1)).strftime("%Y-%m-%d")
+    today = date.today()
+    next2month = date.today() + timedelta(NEXT_X_MONTHS)
+    tomorrow = date.today() + timedelta(1)
 
     start_date = today
     end_date = next2month
+
+    # Holiday logic: reduce search window if overlapping with that of the holiday 
+    print(min([HOLIDAY_START_DATE, HOLIDAT_END_DATE, today, next2month]))
+    print(max([HOLIDAY_START_DATE, HOLIDAT_END_DATE, today, next2month]))
 
     with subprocess.Popen([
         "python3", 
@@ -36,9 +44,9 @@ while True:
         "--campground=233116", 
         "--campground=231959", 
         "--start-date",
-        start_date,
+        start_date.strftime(DATE_FORMAT),
         "--end-date",
-        end_date,
+        end_date.strftime(DATE_FORMAT),
         "--weekends", 
         #"--continuous", 
         #"--notifications", 
@@ -48,9 +56,10 @@ while True:
         ], stdout=subprocess.PIPE) as process:
         while process.poll() is None:
             get_char(process)
-            today = date.today().strftime("%Y-%m-%d")
-            next2month = (date.today() + timedelta(NEXT_X_MONTHS)).strftime("%Y-%m-%d")
-            if today != process.args[7]:
+            today = date.today()
+            next2month = (date.today() + timedelta(NEXT_X_MONTHS))
+
+            if today.strftime(DATE_FORMAT) != process.args[7]:
                 print(f"weekend_monitor.py: searching date range has changed: [{process.args[7]}, {process.args[9]}] to [{today}, {next2month}], restart search")
                 process.terminate()
             sleep(SLEEP_TIME_IN_SECONDS)
