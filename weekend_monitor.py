@@ -8,7 +8,7 @@ SLEEP_TIME_IN_SECONDS = 1
 NEXT_X_MONTHS = 2*30
 DATE_FORMAT = "%Y-%m-%d"
 HOLIDAY_START_DATE = datetime.strptime("2022-11-17", DATE_FORMAT).date()
-HOLIDAT_END_DATE = datetime.strptime("2022-12-01", DATE_FORMAT).date()
+HOLIDAT_END_DATE = datetime.strptime("2022-12-02", DATE_FORMAT).date()
 
 def get_char(process):
     character = process.stdout.read1()
@@ -33,8 +33,15 @@ while True:
     end_date = next2month
 
     # Holiday logic: reduce search window if overlapping with that of the holiday 
-    print(min([HOLIDAY_START_DATE, HOLIDAT_END_DATE, today, next2month]))
-    print(max([HOLIDAY_START_DATE, HOLIDAT_END_DATE, today, next2month]))
+    if (end_date > HOLIDAY_START_DATE and end_date < HOLIDAT_END_DATE):
+        end_date = HOLIDAY_START_DATE
+    if (start_date > HOLIDAY_START_DATE and start_date < HOLIDAT_END_DATE):
+        start_date = HOLIDAT_END_DATE
+    if (start_date < HOLIDAY_START_DATE and end_date > HOLIDAT_END_DATE):
+        # Parallel handling needed, P2
+        pass
+    if (start_date > end_date):
+        print(f"weekend_monitor.py: Holiday overlapping search window, holiday window:[{HOLIDAY_START_DATE}, {HOLIDAT_END_DATE}], search window:[{today}, {next2month}]")
 
     with subprocess.Popen([
         "python3", 
@@ -59,7 +66,7 @@ while True:
             today = date.today()
             next2month = (date.today() + timedelta(NEXT_X_MONTHS))
 
-            if today.strftime(DATE_FORMAT) != process.args[7]:
+            if today > datetime.strptime(process.args[7], DATE_FORMAT).date():
                 print(f"weekend_monitor.py: searching date range has changed: [{process.args[7]}, {process.args[9]}] to [{today}, {next2month}], restart search")
                 process.terminate()
             sleep(SLEEP_TIME_IN_SECONDS)
