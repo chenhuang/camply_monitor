@@ -55,11 +55,11 @@ while True:
         "--end-date",
         end_date.strftime(DATE_FORMAT),
         "--weekends", 
-        #"--continuous", 
-        #"--notifications", 
-        #"email", 
-        #"--search-forever", 
-        #"--polling-interval=5"
+        "--continuous", 
+        "--notifications", 
+        "email", 
+        "--search-forever", 
+        "--polling-interval=5"
         ], stdout=subprocess.PIPE) as process:
         while process.poll() is None:
             get_char(process)
