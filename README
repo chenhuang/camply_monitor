@@ -1,5 +1,5 @@
 Enable an automated process/robot that: 
 1. constantly checking cralwer status and ensure pipeline is properly ran. 
 2. Restart if pipeline no longer works. 
-3. Update pipeline searching period on a daily basis -> expand the search to 2 months ahead.
+3. Update pipeline searching period on a daily basis -> expand the search to X months ahead.
 4. Skip vacation days

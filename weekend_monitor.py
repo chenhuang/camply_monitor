@@ -5,7 +5,7 @@ from datetime import datetime
 from datetime import timedelta
 
 SLEEP_TIME_IN_SECONDS = 1
-NEXT_X_MONTHS = 2*30
+NEXT_X_MONTHS = 3*30
 DATE_FORMAT = "%Y-%m-%d"
 HOLIDAY_START_DATE = datetime.strptime("2022-11-17", DATE_FORMAT).date()
 HOLIDAT_END_DATE = datetime.strptime("2022-12-02", DATE_FORMAT).date()
